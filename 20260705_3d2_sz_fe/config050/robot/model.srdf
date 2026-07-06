@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!-- Semantic robot description (SRDF) for the template arm.
+     Pinocchio loads two things from this file:
+       * removeCollisionPairs(model, geom_model, srdf)  -> <disable_collisions>  (STANDARD SRDF)
+       * loadRotorParameters(model, srdf)               -> <rotor_params>        (PINOCCHIO EXTENSION)
+     The case.yaml points here via robot.srdf_path. -->
+<robot name="motor_select_1">
+  <!-- Self-collision disables: kinematically adjacent / by-construction-overlapping link pairs.
+       (Replaces the old inline case.yaml collision.disabled_pairs.) -->
+  <disable_collisions link1="L1" link2="L2" reason="Adjacent"/>
+  <disable_collisions link1="L1" link2="L_base" reason="Adjacent"/>
+  <disable_collisions link1="L2" link2="L3" reason="Adjacent"/>
+  <disable_collisions link1="L3" link2="L4" reason="Adjacent"/>
+  <disable_collisions link1="L4" link2="L5" reason="Adjacent"/>
+  <disable_collisions link1="L5" link2="L6" reason="Adjacent"/>
+  <disable_collisions link1="L6" link2="L7" reason="Adjacent"/>
+  <disable_collisions link1="L6" link2="L_tool" reason="Adjacent"/>
+ 
+
+  <!-- Rotor reflected inertia (Pinocchio extension, NOT standard SRDF):
+       armature[j] = mass (rotor inertia, kg*m^2) * gear_ratio^2.
+       Only affects dynamic (ddq != 0) extrema scans; static reachability is unchanged.
+       PLACEHOLDER values - replace mass/gear_ratio per joint with real motor specs. -->
+  <rotor_params>
+    <joint name="J1" mass="1.0e-4" gear_ratio="1"/>
+    <joint name="J2" mass="1.0e-4" gear_ratio="1"/>
+    <joint name="J3" mass="1.0e-4" gear_ratio="1"/>
+    <joint name="J4" mass="1.0e-4" gear_ratio="1"/>
+    <joint name="J5" mass="1.0e-4" gear_ratio="1"/>
+    <joint name="J6" mass="1.0e-4" gear_ratio="1"/>
+    <joint name="J7" mass="1.0e-4" gear_ratio="1"/>
+  </rotor_params>
+
+  <!-- Standard SRDF named configuration: "home" = all joints at 0 (the reference/neutral pose).
+       Read by pin.loadReferenceConfigurations -> model.referenceConfigurations["home"]. -->
+  <group name="arm">
+    <joint name="J1"/>
+    <joint name="J2"/>
+    <joint name="J3"/>
+    <joint name="J4"/>
+    <joint name="J5"/>
+    <joint name="J6"/>
+    <joint name="J7"/>
+  </group>
+  <group_state name="home" group="arm">
+    <joint name="J1" value="0"/>
+    <joint name="J2" value="0"/>
+    <joint name="J3" value="0"/>
+    <joint name="J4" value="0"/>
+    <joint name="J5" value="0"/>
+    <joint name="J6" value="0"/>
+    <joint name="J7" value="0"/>
+  </group_state>
+</robot>

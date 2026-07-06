@@ -1,0 +1,105 @@
+# One self-contained case (the base side of a comparison). Copy the whole config_base/
+# folder to config_compare/ and edit values to define the comparison case.
+# Validated once at load (prepare_case): unknown keys are rejected, and the declared entity
+# names + joint_limits are cross-checked against the URDF (a mismatch errors out).
+robot:
+  urdf_path: robot/model.urdf
+  srdf_path: robot/model.srdf   # <disable_collisions> + <rotor_params> (armature)
+  base_link: L_base
+  revolute_joints: [J1, J2, J3, J4, J5, J6, J7]
+  revolute_links:  [L1, L2, L3, L4, L5, L6, L7]
+  fixed_joints:    [J_tool, J_tip]
+  fixed_links:     [L_tool, L_tip]
+  tip_name:        L_tip
+  joint_limits:
+    J1: {lower: -3.141593, upper: 3.141593, velocity: 100.0}
+    J2: {lower: -2.391101, upper: 0.314159, velocity: 100.0}
+    J3: {lower: -3.141593, upper: 3.141593, velocity: 100.0}
+    J4: {lower: -2.234021, upper: 2.234021, velocity: 100.0}
+    J5: {lower: -3.141593, upper: 3.141593, velocity: 100.0}
+    J6: {lower: -1.570796, upper: 1.570796, velocity: 100.0}
+    J7: {lower: -1.570796, upper: 1.570796, velocity: 100.0}
+  gravity: [0.0, 0.0, -9.81]
+
+wrench:
+  tau_max: [178.4, 178.4, 178.4, 89.8, 89.8, 62.4, 27.2]
+  external_wrench: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+collision:
+  enable: true
+  # disabled self-collision pairs now live in the SRDF (<disable_collisions>) at robot.srdf_path
+  security_margin: 0.0   # >0 inflates geometry to flag near-misses
+
+# Reachability is a position concept: keep dq/ddq singletons so the wrench grid's q
+# ordering matches the collision q-only grid.
+scan:
+  n_jobs: 16                 # parallel worker processes (joblib/loky) for every feature's grid scan
+  q_candidates:
+    J1: [-3.141593, -2.5132744, -1.8849558, -1.2566372, -0.6283186, 0.0, 0.6283186, 1.2566372, 1.8849558, 2.5132744]
+    J2: [-2.391101, -2.120575, -1.850049, -1.579523, -1.308997, -1.038471, -0.767945, -0.497419, -0.226893, 0.043633, 0.314159]
+    J3: [-3.141593, -2.5132744, -1.8849558, -1.2566372, -0.6283186, 0.0, 0.6283186, 1.2566372, 1.8849558, 2.5132744]
+    J4: [-2.234021,   -1.3404126, -0.8936084, -0.4468042, 0.0, 0.4468042, 0.8936084, 1.3404126, 1.7872168, 2.234021]
+    J5: [-3.141593, -2.5132744, -1.8849558, -1.2566372, -0.6283186, 0.0, 0.6283186,  1.8849558, 2.5132744]
+    J6: [-1.570796, -1.2566368, -0.9424776, -0.6283184, -0.3141592, 0.0, 0.3141592, 0.6283184, 0.9424776, 1.2566368, 1.570796]
+    J7: [-1.570796, -1.2566368, -0.6283184, -0.3141592, 0.0, 0.3141592, 0.9424776, 1.2566368, 1.570796]
+  dq_candidates:
+    J1: [0.0]
+    J2: [0.0]
+    J3: [0.0]
+    J4: [0.0]
+    J5: [0.0]
+    J6: [0.0]
+    J7: [0.0]
+  ddq_candidates:
+    J1: [0.0]
+    J2: [0.0]
+    J3: [0.0]
+    J4: [0.0]
+    J5: [0.0]
+    J6: [0.0]
+    J7: [0.0]
+
+workplane:
+  read_cloud_from_file: true    # true=READ io.fk_cloud (existence/robot/staleness checked); false=compute inline
+  azimuth: 0.0
+  tilt: 1.5708
+  distance: 1.0670
+  # azimuth: 0.0
+  # tilt: 3.14
+  # distance: -1.041
+  # cone-angle coverage table thresholds (rad) reported in the Stage-C summary; the t=0 row is the
+  # reach-normal count (sanity check). cone_bbox_threshold (rad) drives the oriented-bbox overlay.
+  cone_thresholds: [0.0, 0.17, 0.34, 0.52]    # 0 / 10 / 20 / 30 deg
+  cone_bbox_threshold: 0.0
+  n_sampling_points: 800
+  ik: {max_iters: 100, pos_tol: 1.0e-4, rot_tol: 1.0e-3, damping: 1.0e-6, step_scale: 1.0}
+  seeds: {seed_pool_band: 0.3, rot_weight: 0.5, k_nearest_6d_space: 50, max_6d_space_distance: null}
+  orientation:
+    # intrinsic Euler ZXZ (plane frame): z1=precession (rim sweep), x=nutation=cone angle, z2=spin.
+    z1_candidates: [-2.3562, -1.5708, -0.7854, 0, 0.7854, 1.5708, 2.3562, 3.1416]  # -45, -90, -135, 0, 135, 90, 45, 180 deg
+    x_candidates:  [0.0, 0.087266, 0.174533, 0.261799, 0.349066, 0.436332, 0.523599] # 0, 5, 10, 15, 20, 25, 30 deg
+    z2_candidates: [0.0] 
+
+# stiffness:            # PLACEHOLDER (not implemented)
+#   enable: false
+#   joint_stiffness: [k1, k2, k3, k4, k5, k6, k7]
+#   link_stiffness: {L1: [[...6x6...]]}
+
+io:                                 # every file path in one place (paths + viser grouped)
+  fk_cloud: data/output/workspace_FKcollision_scan_result.npz  # was read_cloud_from_file: true + that cloud_filename
+  scan_output: data/output/workspace_scan_result100.npz
+  workplane_output: data/output/workplane_result100.npz
+  export_dir: data/viewer_export_100
+
+viewer:                          # live viser + static-webpage export knobs (section optional — absent = all
+                                 #   self-contained static click-to-re-pose page). Every field is ALSO editable
+                                 #   afterwards in the exported webpage/scene.json (camera / point_size / per-layer
+                                 #   visible & clickable / mesh color). Omit this whole section to use defaults.
+  host: 127.0.0.1                # live viser server address (moved here from robot.viser)
+  port: 8084
+  viser_point_size: 0.008        # live scene's primary point-cloud dot size (m)
+  envelope_tightness: 0.05       # reachability α-shape hull tightness (0 = convex hull)
+  point_size: 0.08               # EXPORTED webpage point size (m)
+  background: "#ffffff"
+  mesh_color: [210, 210, 210]    # arm mesh color, RGB 0-255
+  camera: {position: [3, 0, 3], target: [0.0, 0.0, 0.3], up: [0.0, 0.0, 3.0], fov: 50}
