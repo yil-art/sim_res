@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #101014;
+               font-family: system-ui, sans-serif; }
+  #c { width: 100vw; height: 100vh; display: block; }
+  #panel { position: fixed; top: 10px; left: 10px; background: rgba(20,20,28,.82);
+           color: #ddd; padding: 10px 12px; border-radius: 8px; font-size: 13px; }
+  #panel label { display: block; cursor: pointer; line-height: 1.7; }
+  #title { font-weight: 600; margin-bottom: 6px; color: #fff; }
+  #info { position: fixed; bottom: 10px; left: 10px; background: rgba(20,20,28,.82);
+          color: #9fe; padding: 6px 10px; border-radius: 6px; font-size: 12px;
+          font-family: monospace; }
+  #summary-toggle { display: none; margin-top: 6px; padding: 4px 8px; border: none;
+                    border-radius: 6px; background: #333; color: #ddd; cursor: pointer;
+                    font-size: 12px; }
+  #summary { display: none; position: fixed; top: 10px; right: 10px; margin: 0;
+             max-width: 420px; max-height: 80vh; overflow: auto; white-space: pre-wrap;
+             background: rgba(20,20,28,.92); color: #ddd; padding: 10px 12px;
+             border-radius: 8px; font-size: 12px; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./three.module.js" } }
+</script>
+</head>
+<body>
+  <div id="panel">
+    <div id="title">viewer</div>
+    <button id="summary-toggle">ℹ summary</button>
+  </div>
+  <div id="info">drag to orbit · click a point to re-pose</div>
+  <pre id="summary"></pre>
+  <canvas id="c"></canvas>
+  <script type="module" src="./viewer.js"></script>
+</body>
+</html>
